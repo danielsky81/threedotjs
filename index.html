@@ -12,6 +12,8 @@
         // Creating a scene
 
         var scene = new THREE.Scene();
+
+        // Creating a camera
         // PerspectiveCamera( fov : Number, aspect : Number, near : Number, far : Number )
         var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -19,21 +21,48 @@
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );
 
+        camera.position.z = 75
+
         // Creating an shape
 
         var geometry = new THREE.BoxGeometry( 10, 10, 10 );
-        var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+        var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
         var cube = new THREE.Mesh( geometry, material );
         scene.add( cube );
 
         cube.position.x = -30;
+        cube.rotation.y = 50;
 
-        var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
-        var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
-        var torusKnot = new THREE.Mesh( geometry, material );
+        var geometryTk = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+        var materialTk = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: true } );
+        var torusKnot = new THREE.Mesh( geometryTk, materialTk );
         scene.add( torusKnot );
 
-        camera.position.z = 75
+        var geometryIc = new THREE.IcosahedronGeometry( 8, 1 );
+        var ico;
+        // texture
+        var textureLoader = new THREE.TextureLoader();
+        textureLoader.crossOrigin = true;
+        textureLoader.load('https://s3-us-west-2.amazonaws.com/s.cdpn.io/53148/4268-bump.jpg', function(texture) {
+            // apply the texture as a bump map
+            var materialIc = new THREE.MeshPhongMaterial( {color: 0xffffff, bumpMap: texture} );
+            ico = new THREE.Mesh( geometryIc, materialIc );
+            scene.add( ico );
+            
+            ico.position.x = 30;
+            // render();
+        });
+
+
+        // Add light to the scene
+
+        var light = new THREE.PointLight(0x33FFFF);
+        light.position.set(-75, 0, 45);
+        scene.add(light);
+
+        var light1 = new THREE.PointLight(0xFF33F9);
+        light1.position.set(75, 0, 45);
+        scene.add(light1);
 
         // Rendering the scene
 
@@ -42,13 +71,19 @@
 
             // Animating the cube
 
-            cube.rotation.x += 0.01;
+            cube.rotation.x += 0.1;
             cube.rotation.y += 0.01;
+            cube.rotation.z += 0.001;
 
             // Animating the Torus
 
             torusKnot.rotation.x += 0.01;
             torusKnot.rotation.y += 0.01;
+
+            // Animating the cube
+
+            ico.rotation.x += 0.001;
+            ico.rotation.y += 0.001;
 
             renderer.render( scene, camera );
         }
